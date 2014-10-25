@@ -1,0 +1,5 @@
+For very large array a segmentation fault may occurr due to the default limits of the program's stack set by the operating system.
+On *nix systems use:
+ulimit -s unlimited
+
+CAUTION! This may still cause segmentation fault if you do not have enough memory (incl. virtual). Use with great caution. Also even for something like an array of 16000000 elements on a system with 4GB RAM it gets filled up and you will experience sever performance drops therefore it is advisable to save all your work, close as many applications as possible and then simply let the damn thing run. LOL
