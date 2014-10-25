@@ -3,3 +3,6 @@ On *nix systems use:
 ulimit -s unlimited
 
 CAUTION! This may still cause segmentation fault if you do not have enough memory (incl. virtual). Use with great caution. Also even for something like an array of 16000000 elements on a system with 4GB RAM it gets filled up and you will experience sever performance drops therefore it is advisable to save all your work, close as many applications as possible and then simply let the damn thing run. LOL
+
+That is why dynamic allocation has to be used. Currently main.cpp contains a small test that works with the stack and the array there
+is limited only to 100 elements
