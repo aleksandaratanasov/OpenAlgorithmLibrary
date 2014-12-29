@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <array>
 #include <cassert>
+#include "swap.h"
 #define CUTOFF 7 // used to cut off the insertion sort, which is great for small arrays only
 
 using std::array;
@@ -11,18 +12,21 @@ using std::array;
 namespace sorting {
   namespace mergesort {
 
+    namespace natural {
+      template <typename T, size_t S>
+      void sort(array<T,S>& a) {
+      }
+
+      template <typename T, size_t S>
+      void merge() {
+      }
+    }
+
     // Optimized top-down mergesort
     //  - use insertion sort for the small subarrays
     //  - TODO: test if array that is to be sorted isn't already sorted
     //  - eliminate the copy of the auxiliary array
     namespace topdown {
-      template <typename T, size_t S>
-      void swap(array<T,S>& a, int i, int j) {
-          T swap = a[i];
-          a[i] = a[j];
-          a[j] = swap;
-      }
-
       /*template <typename T, size_t S>
       bool isSorted(array<T,S>& a, size_t lo, size_t hi) {
         for (size_t i = lo + 1; i <= hi; ++i)
@@ -103,11 +107,10 @@ namespace sorting {
         if(S < 2)
           return;
 
-        array<int,S> *ap,*tmp;
-        tmp = new array<int,S>();
-        ap = &a;
-        sort(*tmp, *ap, 0, S-1);
-        delete tmp;
+        // TODO: Need to allocate on heap here and not on stack! Change this
+        array<T,S> tmp = a;
+        sort(tmp, a, 0, S-1);
+        //delete tmp;
 //        assert (isSorted(a));
       }
     }
@@ -137,8 +140,8 @@ namespace sorting {
         if(S < 2)
           return;
 
-        array<int,S> *ap,*tmp;
-        tmp = new array<int,S>();
+        array<T,S> *ap,*tmp;
+        tmp = new array<T,S>();
         ap = &a;
 
         size_t i,j,lo,mi,hi;

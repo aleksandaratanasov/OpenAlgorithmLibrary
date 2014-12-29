@@ -6,6 +6,14 @@
 
 namespace sorting {
   namespace insertionsort {
+    template <typename T>
+    void swap(T& t1, T& t2) {
+      //printf("Swapping [%d] and [%d]\n", *t1, *t2);
+      T temp = t1;
+      t1 = t2;
+      t2 = temp;
+    }
+
     namespace normal{
       template <typename T, size_t S>
       void sort(std::array<T,S>& a) {
@@ -19,12 +27,9 @@ namespace sorting {
       template <typename T, size_t S>
       void sort(std::array<T,S>& a) {
         size_t i,j;
-        T guard;
         for (i = 1; i < S; ++i) {
-          guard = a[i];
-          for (j = i; j > 0 && guard < a[j - 1]; --j)
-            a[j] = a[j - 1];
-          a[j] = guard;
+          for (j = i; j > 0 && a[j] < a[j - 1]; --j)
+            swap(a[j], a[j-1]);
         }
       }
     }

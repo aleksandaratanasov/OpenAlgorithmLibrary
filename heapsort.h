@@ -8,8 +8,20 @@ using std::array;
 
 namespace sorting {
   namespace heapsort {
+    // p.324
     template <typename T, size_t S>
     void sort(std::array<T,S> &a) {
+    }
+
+    // p.316
+    template <typename T, size_t S>
+    void sink() {
+
+    }
+
+    template <typename T, size_t S>
+    void swim() {
+
     }
   }
 }
