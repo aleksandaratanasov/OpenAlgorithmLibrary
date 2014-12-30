@@ -17,10 +17,11 @@
 #define INTEGER
 //#define STRING
 //#define DOUBLE
-#define OUTPUT
+//#define OUTPUT
 #define DEBUG
-#define SIZE 100//1000000
-#define STRING_LENGTH_RANGE 100
+#define CHECK_SORT
+#define SIZE 10000//1000000
+#define STRING_LENGTH_RANGE 32
 // sorting choices
 #define BUBBLE                      1
 #define INSERTION_WITHGUARD         2 // currently only with guard
@@ -41,6 +42,10 @@ using std::string;
 using std::array;
 using std::chrono::high_resolution_clock;
 //using std::vector;
+
+/*
+ * TODO: Mergesort topdown is not working for large arrays (exp: with 10000 there are TWO elements that are not sorted properly)
+ */
 
 int main(int argc, char *argv[]) {
   int min, max;
@@ -68,7 +73,8 @@ int main(int argc, char *argv[]) {
   cout << a->size() << endl;
 #endif
 
-  for(size_t i = 0; i < a->size(); ++i){
+  size_t i;
+  for(i = 0; i < a->size(); ++i){
 #ifdef INTEGER
     (*a)[i] = min + (rand() % (max - min + 1));
 #endif
@@ -109,7 +115,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 #else
-  choice = QUICK_NORMAL;
+  choice = MERGE_TOPDOWN;
 #endif
 
   cout << "Sorting using ";
@@ -200,6 +206,7 @@ int main(int argc, char *argv[]) {
 #endif
       break;
     case MERGE_TOPDOWN:
+      cout << "mergesort top down" << endl;
 #ifdef INTEGER
       sorting::mergesort::topdown::sort<int, SIZE>(*a); // WORKS
 #endif
@@ -248,10 +255,20 @@ int main(int argc, char *argv[]) {
       break;
   }
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
-
+  bool sorted = true;
+#ifdef CHECK_SORT
+  for(i = 0; i < a->size()-1; ++i)
+    if(a->at(i) > a->at(++i)) { //ascending order only!
+      cout << "Bad element at index " << i << endl;
+      sorted = false;
+      //exit(EXIT_FAILURE);
+    }
+  if(sorted) cout << "Array sorted correctly!" << endl;
+  else cout << "Array not sorted correctly!" << endl;
+#endif
 #ifdef OUTPUT
   cout << "********Sorted********" << endl;
-  for(size_t i = 0; i < a->size(); ++i) {
+  for(i = 0; i < a->size(); ++i) {
     cout << a->at(i) << endl;
   }
 #endif

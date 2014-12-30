@@ -108,9 +108,12 @@ namespace sorting {
           return;
 
         // TODO: Need to allocate on heap here and not on stack! Change this
-        array<T,S> tmp = a;
-        sort(tmp, a, 0, S-1);
-        //delete tmp;
+//        array<T,S> *tmp = new array<T,S>(); //NEW
+        array<T,S> tmp = a; //OLD
+        sort(tmp, a, 0, S-1); //OLD
+//        copyArray(a,0,*tmp,0,S); //NEW
+//        sort(*tmp, a, 0, S-1);  //NEW
+//        delete tmp; //NEW
 //        assert (isSorted(a));
       }
     }

@@ -32,6 +32,15 @@ namespace sorting {
             swap(a[j], a[j-1]);
         }
       }
+
+      template <typename T, size_t S>
+      void sortRange(std::array<T,S>& a, size_t l, size_t h) {
+        size_t i,j;
+        for (i = l; i < h; ++i) {
+          for (j = i; j > 0 && a[j] < a[j - 1]; --j)
+            swap(a[j], a[j-1]);
+        }
+      }
     }
   }
 }
