@@ -5,7 +5,8 @@
 //#include <cstdlib>
 #include <chrono>         // for measuring execution time
 #include <sys/resource.h>
-#include <gtest/gtest.h>  // Google Test C++ Framework
+//#include <gtest/gtest.h>  // Google Test C++ Framework
+
 #include "bubblesort.h"
 #include "insertionsort.h"
 #include "quicksort.h"
@@ -14,25 +15,43 @@
 #include "shellsort.h"
 #include "randomstring.h"
 
+/*
+ * SOURCES:
+ * - Rosettacode - for most of the pseudocode
+ * - Wikibooks - in-place heapsort
+ * - Algorithms (4th Edition) by Robert Sedgewick and Kevin Wayne - optimization, porting from Java
+ * - other resources on the Internet - various literature on optimization of the algorithms
+ *
+ * TODO:
+ * - add the optimizations proposed in the exercises in the book mentioned above
+ *
+ * STATUS:
+ * - WORKING (tested with integer and string using 10, 100, 1000, 100000 and 1000000 elements)
+ * - not implemented
+ * - else - some bug or unable to proceed
+ */
+
 #define INTEGER
 //#define STRING
 //#define DOUBLE
 //#define OUTPUT
 #define DEBUG
 #define CHECK_SORT
-#define SIZE 10000//1000000
+#define SIZE 100000//1000000
 #define STRING_LENGTH_RANGE 32
 // sorting choices
-#define BUBBLE                      1
-#define INSERTION_WITHGUARD         2 // currently only with guard
-#define SHELL                       3
-#define MERGE_TOPDOWN               4
-#define MERGE_BOTTOMUP              5
-#define QUICK_NORMAL                6
-#define QUICK_NORMAL_BITSHIFT       7
-#define QUICK_3WAYPARTITION         8
-#define QUICK_HYBRID                9
-#define HEAP                        10
+#define BUBBLE                      1   // WORKING
+#define INSERTION_NORMAL            2   // WORKING
+#define INSERTION_WITHGUARD         3   // not implemented
+#define INSERTION_WITHGUARDIDXTRANS 4   // not implemented (guard+index transformation)
+#define SHELL                       5   // WORKING
+#define MERGE_TOPDOWN               6   // for >4500 integer (probably also double) elements fails (incorrectly sorted) - works for strings
+#define MERGE_BOTTOMUP              7   // WORKING
+#define QUICK_NORMAL                8   // WORKING (implementation by Sedgwick is for some reason not working)
+#define QUICK_NORMAL_BITSHIFT       9   // WORKING
+#define QUICK_3WAYPARTITION         10  // WORKING
+#define QUICK_HYBRID                11  // not implemented
+#define HEAP_INPLACE                12  // WORKING
 
 using std::cout;
 using std::cerr;
@@ -41,10 +60,13 @@ using std::endl;
 using std::string;
 using std::array;
 using std::chrono::high_resolution_clock;
-//using std::vector;
 
 /*
- * TODO: Mergesort topdown is not working for large arrays (exp: with 10000 there are TWO elements that are not sorted properly)
+ * TODOs and ISSUEs:
+ *  (ISSUE) Mergesort topdown is not working for large INTEGER arrays (only arrays with up to incl. 4500 elements are okay O_o); haven't checked with doubles
+ *  (TODO) Replace own swap(T& a, T& b) with std::swap
+ *  (TODO) Make mergesort use insertion sort from the insertionsort-namespace (the 3-argument method!)
+ *  (TODO) See if copyArray has a standard implementation part of the C/C++ standards
  */
 
 int main(int argc, char *argv[]) {
@@ -98,19 +120,23 @@ int main(int argc, char *argv[]) {
 #ifndef DEBUG
   cout << "\nList of available sorting algorithms:\n"
        << "1 - bubble\n"
-       << "2 - insertion\n"
-       << "3 - shell\n"
-       << "4 - merge (top down)\n"
-       << "5 - merge (bottom up)\n"
-       << "6 - quick (normal)\n"
-       << "7 - quick (normal with shift)\n"
-       << "8 - quick (3-way-partition)\n"
-       << "9 - quick (hybrid)\n"
-       << "10 - heap"
+       << "2 - insertion (normal)\n"
+       << "3 - insertion (with guard)\n"
+       << "4 - insertion (with guard and index transformation)\n"
+       << "5 - shell\n"
+       << "6 - merge (top-down)\n"
+       << "7 - merge (bottom-up)\n"
+       << "8 - quick (normal)\n"
+       << "9 - quick (normal with bitshift)\n"
+       << "10 - quick (3-way-partition)\n"
+       << "11   quick (hybrid: 3-way-partition with insertion sort and left/right weighing)\n"
+       << "12 - heap (in-place)\n\n"
+       << "WARNING: Especially with algorithms such as bubblesort sorting large arrays is strongly discouraged!"
+       << "Note: quicksort "
        << endl;
   cout << "Your choice: ";
   cin >> choice;
-  if(choice < 0 && choice > HEAP) {
+  if(choice < 0 && choice > HEAP_INPLACE) {
     cout << "Selected option does not exist." << endl;
     exit(EXIT_FAILURE);
   }
@@ -217,7 +243,7 @@ int main(int argc, char *argv[]) {
       sorting::mergesort::topdown::sort<double, SIZE>(*a);
 #endif
       break;
-    case HEAP:
+    case HEAP_INPLACE:
       cout << "heapsort" << endl;
 #ifdef INTEGER
       sorting::heapsort::sort<int, SIZE>(*a);
@@ -229,16 +255,16 @@ int main(int argc, char *argv[]) {
       sorting::heapsort::sort<double, SIZE>(*a);
 #endif
       break;
-    case INSERTION_WITHGUARD:
+    case INSERTION_NORMAL:
       cout << "insertionsort" << endl;
 #ifdef INTEGER
-      sorting::insertionsort::withguard::sort<int, SIZE>(*a); // code complete
+      sorting::insertionsort::normal::sort<int, SIZE>(*a);
 #endif
 #ifdef STRING
-      sorting::insertionsort::withguard::sort<string, SIZE>(*a);
+      sorting::insertionsort::normal::sort<string, SIZE>(*a);
 #endif
 #ifdef DOUBLE
-      sorting::insertionsort::withguard::sort<double, SIZE>(*a);
+      sorting::insertionsort::normal::sort<double, SIZE>(*a);
 #endif
       break;
     case SHELL: // WORKS but see note in header file
@@ -261,7 +287,6 @@ int main(int argc, char *argv[]) {
     if(a->at(i) > a->at(++i)) { //ascending order only!
       cout << "Bad element at index " << i << endl;
       sorted = false;
-      //exit(EXIT_FAILURE);
     }
   if(sorted) cout << "Array sorted correctly!" << endl;
   else cout << "Array not sorted correctly!" << endl;

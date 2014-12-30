@@ -13,6 +13,7 @@ using std::array;
 
 namespace sorting {
   namespace quicksort {
+    // STATUS: not working
     namespace hybrid {
       //Following implementation uses treeway partitioning, bit shifting, insertion sort (p.296) for small partitions and weighing if left or right branch are smaller/larger
       template <typename T, size_t S>
@@ -20,7 +21,7 @@ namespace sorting {
         long int i = l-1, j = r, p = l-1, q = r;
 
         if (r <= l + CUTOFF) {
-          insertionsort::withguard::sortRange(a,l,r); // Segmentation fault here
+//          insertionsort::withguard::sortRange(a,l,r); // Segmentation fault here
           return;
         }
         T pivot = a[r];
@@ -57,6 +58,7 @@ namespace sorting {
       }
     }
 
+    // STATUS: working
     namespace threewaypartwithshift {
       template <typename T, size_t S>
       void sort(std::array<T,S>& a, long int l, long int r) {
@@ -98,140 +100,71 @@ namespace sorting {
     }
 
     namespace normalwithshift {
-      template <typename T, size_t S>
-      void sort(std::array<T,S>& a, size_t l, size_t r) {
-        size_t i = l;
-        size_t j = r;
-        T pivot = a[(l+(r-l)) >> 1];  // the only difference is that we use bit shifting here instead of /2
-
-        if(r <= l) return;
-
-        for(;;) {
-          while(a[++i] < pivot);
-
-          while(a[--j] > pivot)
-            if(j == i) break;
-
-          if(i >= j) break;
-
-          swap(a[i], a[j]);
-        }
-
-        swap(a[i], a[r]);
-        sort(a, l, i-1);
-        sort(a, i+1, r);
-      }
-
-      template <typename T, size_t S>
-      void sort(std::array<T,S> &a) {
-//        std::random_shuffle(std::begin(a), std::end(a));
-        sort(a, 0, a.size());
-      }
-    }
-
-    namespace normal {
-//    template <typename T, size_t S>
-//    size_t partition (std::array<T,S> &a, size_t lo, size_t hi) {
-//      size_t i = lo, j = hi+1;
-//      //T *v = new T(*a[lo]);
-//      T pivot = a[(lo+hi)/2];
-//      while(true) {
-//        while(*a[++i] < *pivot);
-////          if(i == hi) break;
-//        while(*pivot < *a[--j])
-////          if(j == lo) break;
-//          if(j == i) break;
-//        if(i >= j) break;
-//        swap(a[i], a[j]);
-//      }
-//      swap(a[lo], a[j]);
-//      return j;
-//    }
-
-//    template <typename T, size_t S>
-//    void qsort(std::array<T,S> &a, size_t lo, size_t hi){
-//      if(hi <= lo) return;
-//      size_t j = partition(a, lo, hi);
-//      qsort(a, lo, j-1);
-//      qsort(a, j+1, hi);
-//    }
-
-      /*
-      template <typename T>
-      void swap(T& t1, T& t2) {
-        //printf("Swapping [%d] and [%d]\n", *t1, *t2);
-        T temp = t1;
-        t1 = t2;
-        t2 = temp;
-      }
-
-      template <typename T, size_t S>
-      void sort(std::array<T,S>& a, size_t l, size_t r) {
-        size_t i = l;
-        size_t j = r;
-        T pivot = a[(l+(r-l))/2];
-
-        if(r <= l) return;
-
-        for(;;) {
-          while(a[++i] < pivot);
-
-          while(a[--j] > pivot)
-            if(j == i) break;
-
-          if(i >= j) break;
-
-          swap(a[i], a[j]);
-        }
-
-        swap(a[i], a[r]);
-        sort(a, l, i-1);
-        sort(a, i+1, r);
-      }
-      */
       /*template <typename T, size_t S>
-      size_t partition(std::array<T,S>& a, size_t l, size_t r) {
-        size_t i = l, j = r+1;
-//        T pivot = a[(l+(r-l))/2];
-        T pivot = a[l];
-        while(true) {
-          while(a[++i] < pivot)
-            if(i == r) break;
-          while(pivot < a[--j])
-            if(j == l) break;
-          if(i >= j) break;
+      size_t partition(std::array<T,S>& a, size_t lo, size_t hi) {
+        size_t i = lo;
+        size_t j = hi + 1;
+        T pivot = a[(lo + hi) >> 1];
+        while (true) {
+          while (a[++i] < pivot)
+            if (i == hi) break;
+          while (pivot < a[--j])
+            if (j == lo) break;
+          if (i >= j) break;
           swap(a, i, j);
         }
-        swap(a, l, j);
+        swap(a, lo, j);
         return j;
       }
 
       template <typename T, size_t S>
-      void sort(std::array<T,S>& a, size_t l, size_t r) {
-        if(r <= l) return;
-
-        size_t j = partition(a, l, r);
-        sort(a, l, j-1);
-        sort(a, j+1, r);
+      void sort(std::array<T,S>& a, size_t lo, size_t hi) {
+        if (hi <= lo) return;
+        size_t j = partition(a, lo, hi);
+        sort(a, lo, j-1);
+        sort(a, j+1, hi);
       }*/
 
+      template <typename T, size_t S>
+      void sort(std::array<T,S>& a, size_t l, size_t r) {
+        size_t i = l, j = r;
+        T pivot = a[(l+r)>>1];  //http://stackoverflow.com/questions/6357038/is-multiplication-and-division-using-shift-operators-in-c-actually-faster
+        while (i <= j) {
+          while (a[i] < pivot) i++;
+          while (a[j] > pivot) j--;
+          if (i <= j) {
+            swap(a[i],a[j]);
+            i++;
+            j--;
+          }
+        };
+        if (l < j) sort(a, l, j);
+        if (i < r) sort(a, i, r);
+      }
+
+      template <typename T, size_t S>
+      void sort(std::array<T,S> &a) {
+        sort(a, 0, S-1);
+      }
+    }
+
+    namespace normal {
       //Using size_t is rediculious in case when we have to compare numeric values!!! It results in undefined behaviour (using size_t below leads to segmentation fault)
       template <typename T, size_t S>
-      void sort(std::array<T,S>& a, long int l, long int r) {
-        long int i = l-1, j = r;
-        if (r <= l) return;
-        T pivot = a[r]; //Using (l+r)/2 results in not entirely correct sorting! => version using shift is therefore impossible
-        while(true)
-        {
-          while (a[++i] < pivot) ;
-          while (pivot < a[--j])
-            if (j == l) break;
-          if (i >= j) break;
-          swap(a[i], a[j]);
-        }
-        swap(a[i], a[r]);
-        sort(a, l, i-1);
-        sort(a, i+1, r);
+      void sort(std::array<T,S>& a, size_t l, size_t r) {
+        size_t i = l, j = r;
+        T pivot = a[(l+r)/2];
+        while (i <= j) {
+          while (a[i] < pivot) i++;
+          while (a[j] > pivot) j--;
+          if (i <= j) {
+            swap(a[i],a[j]);
+            i++;
+            j--;
+          }
+        };
+        if (l < j) sort(a, l, j);
+        if (i < r) sort(a, i, r);
       }
 
       template <typename T, size_t S>
