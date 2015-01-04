@@ -10,18 +10,20 @@ if(UNIX)
 endif()
 
 set(headers
+  swap.h
+  randomstring.h
   bubblesort.h
   insertionsort.h
   heapsort.h
   mergesort.h
   quicksort.h
   shellsort.h
-  swap.h
-  randomstring.h
+  #testgenerators.h
 )
 set(sources
-  main.cpp
   randomstring.cpp
+  main.cpp
+  #testgenerators.cpp
 )
 
 add_executable(${PROJECT_NAME} ${headers} ${sources})

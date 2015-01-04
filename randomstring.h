@@ -3,6 +3,9 @@
 
 #include <string>
 
-std::string rand(size_t range);
+namespace testing {
+  std::string randstr(size_t range);
+  std::string randstr(size_t range, unsigned int seed);
+}
 
 #endif // RANDOMSTRING_H

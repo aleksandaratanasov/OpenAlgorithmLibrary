@@ -2,10 +2,12 @@
 #include <string>
 #include <array>          // the container used to store the elements that are sorted
 #include <algorithm>      // for the random shuffle before calling quicksort
-//#include <cstdlib>
+#include <cstdlib>
 #include <chrono>         // for measuring execution time
 #include <sys/resource.h>
 //#include <gtest/gtest.h>  // Google Test C++ Framework
+
+#include <typeinfo>
 
 #include "bubblesort.h"
 #include "insertionsort.h"
@@ -14,6 +16,7 @@
 #include "heapsort.h"
 #include "shellsort.h"
 #include "randomstring.h"
+//#include "testgenerators.h"
 
 /*
  * SOURCES:
@@ -24,6 +27,7 @@
  *
  * TODO:
  * - add the optimizations proposed in the exercises in the book mentioned above
+ * - add descending and ascending test types!
  *
  * STATUS:
  * - WORKING (tested with integer and string using 10, 100, 1000, 100000 and 1000000 elements)
@@ -31,18 +35,27 @@
  * - else - some bug or unable to proceed
  */
 
-#define INTEGER
-//#define STRING
+// Data types
+//#define INTEGER
+#define STRING
 //#define DOUBLE
+
+// Misc flags
 //#define OUTPUT
 #define DEBUG
 #define CHECK_SORT
-#define SIZE 100000//1000000
-#define STRING_LENGTH_RANGE 32
-// sorting choices
+
+// Data specific
+#define SIZE 10000              // The number of elements in the array that is passed to the sorting algorithm
+#ifdef STRING
+  #define STRING_LENGTH_RANGE 32  // In case the data type of choice is string this value is used for the string random generator (see randomstring.h/.cpp);
+                                  // each randomly generated string will have a length between 0 ("\0") and 31 ("....\0")
+#endif
+
+// Sorting algorihtm choices
 #define BUBBLE                      1   // WORKING
 #define INSERTION_NORMAL            2   // WORKING
-#define INSERTION_WITHGUARD         3   // not implemented
+#define INSERTION_WITHGUARD         3   // WORKING
 #define INSERTION_WITHGUARDIDXTRANS 4   // not implemented (guard+index transformation)
 #define SHELL                       5   // WORKING
 #define MERGE_TOPDOWN               6   // for >4500 integer (probably also double) elements fails (incorrectly sorted) - works for strings
@@ -50,7 +63,7 @@
 #define QUICK_NORMAL                8   // WORKING (implementation by Sedgwick is for some reason not working)
 #define QUICK_NORMAL_BITSHIFT       9   // WORKING
 #define QUICK_3WAYPARTITION         10  // WORKING
-#define QUICK_HYBRID                11  // not implemented
+#define QUICK_HYBRID                11  // not implemented (bitshifting not working with 3-way-partitioning)
 #define HEAP_INPLACE                12  // WORKING
 
 using std::cout;
@@ -64,12 +77,16 @@ using std::chrono::high_resolution_clock;
 /*
  * TODOs and ISSUEs:
  *  (ISSUE) Mergesort topdown is not working for large INTEGER arrays (only arrays with up to incl. 4500 elements are okay O_o); haven't checked with doubles
- *  (TODO) Replace own swap(T& a, T& b) with std::swap
+ *  (TODO) Replace own swap(T& a, T& b) with std::swap (since it's the same implementation)
  *  (TODO) Make mergesort use insertion sort from the insertionsort-namespace (the 3-argument method!)
- *  (TODO) See if copyArray has a standard implementation part of the C/C++ standards
+ *  (TODO) See if copyArray is present in STD
  */
 
 int main(int argc, char *argv[]) {
+//  array<int,10> *t;
+//  testing::generateTest(*t);
+//  delete t;
+//  return 0;
   int min, max;
 #ifndef DEBUG
   cout << "Enter minimum integer value for the range of random numbers:";
@@ -96,15 +113,15 @@ int main(int argc, char *argv[]) {
 #endif
 
   size_t i;
-  for(i = 0; i < a->size(); ++i){
+  for(i = 0; i < SIZE; ++i){
 #ifdef INTEGER
     (*a)[i] = min + (rand() % (max - min + 1));
 #endif
 #ifdef STRING
-    (*a)[i] = rand(STRING_LENGTH_RANGE);
+    (*a)[i] = testing::randstr(STRING_LENGTH_RANGE);
 #endif
 #ifdef DOUBLE
-    (*a)[i] = min + (rand() % (max - min +1));
+    (*a)[i] = min +((double)rand() % (max - min +1));
 #endif
 #ifdef OUTPUT
     cout << "a[" << i << "]" << a->at(i) << endl;
@@ -141,7 +158,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 #else
-  choice = MERGE_TOPDOWN;
+  choice = INSERTION_NORMAL;//QUICK_HYBRID;
 #endif
 
   cout << "Sorting using ";
@@ -256,7 +273,7 @@ int main(int argc, char *argv[]) {
 #endif
       break;
     case INSERTION_NORMAL:
-      cout << "insertionsort" << endl;
+      cout << "insertionsort (normal)" << endl;
 #ifdef INTEGER
       sorting::insertionsort::normal::sort<int, SIZE>(*a);
 #endif
@@ -265,6 +282,18 @@ int main(int argc, char *argv[]) {
 #endif
 #ifdef DOUBLE
       sorting::insertionsort::normal::sort<double, SIZE>(*a);
+#endif
+      break;
+    case INSERTION_WITHGUARD:
+      cout << "insertionsort (with sentinel)" << endl;
+#ifdef INTEGER
+      sorting::insertionsort::withguard::sort<int, SIZE>(*a);
+#endif
+#ifdef STRING
+      sorting::insertionsort::withguard::sort<string, SIZE>(*a);
+#endif
+#ifdef DOUBLE
+      sorting::insertionsort::withguard::sort<double, SIZE>(*a);
 #endif
       break;
     case SHELL: // WORKS but see note in header file
@@ -283,7 +312,7 @@ int main(int argc, char *argv[]) {
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
   bool sorted = true;
 #ifdef CHECK_SORT
-  for(i = 0; i < a->size()-1; ++i)
+  for(i = 0; i < SIZE; ++i)
     if(a->at(i) > a->at(++i)) { //ascending order only!
       cout << "Bad element at index " << i << endl;
       sorted = false;

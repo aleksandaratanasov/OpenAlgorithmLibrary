@@ -3,6 +3,7 @@
 
 #include <array>
 #include "swap.h"
+#include "insertionsort.h"
 #define CUTOFF 7 // used to cut off the insertion sort, which is great for small arrays only
 
 using std::array;
@@ -26,14 +27,14 @@ namespace sorting {
     //  - TODO: test if array that is to be sorted isn't already sorted
     //  - eliminate the copy of the auxiliary array
     namespace topdown {
-      template <typename T, size_t S>
-      void insertionSort(array<T,S>& a, size_t lo, size_t hi) {
-        size_t i = lo, j;
+//      template <typename T, size_t S>
+//      void insertionSort(array<T,S>& a, size_t lo, size_t hi) {
+//        size_t i = lo, j;
 
-        for (; i <= hi; ++i)
-          for (j = i; j > lo && a[j] < a[j-1]; --j)
-            swap(a, j, j-1);
-      }
+//        for (; i <= hi; ++i)
+//          for (j = i; j > lo && a[j] < a[j-1]; --j)
+//            swap(a, j, j-1);
+//      }
 
       template <typename T, size_t S>
       void merge(array<T,S>& src, array<T,S>& dst, size_t lo, size_t mid, size_t hi) {
@@ -57,7 +58,8 @@ namespace sorting {
       void sort(array<T,S>& src, array<T,S>& dst, size_t lo, size_t hi) {
         // if (hi <= lo) return;
         if (hi <= lo + CUTOFF) {
-          insertionSort(dst, lo, hi);
+//          insertionSort(dst, lo, hi);
+          insertionsort::sortRange(dst, lo, hi);
           return;
         }
         size_t mid = lo + ((hi - lo) >> 1);

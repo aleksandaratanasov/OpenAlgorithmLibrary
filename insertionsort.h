@@ -20,18 +20,26 @@ namespace sorting {
     namespace withguard {
       template <typename T, size_t S>
       void sort(std::array<T,S>& a) {
-        //http://www.stoimen.com/blog/2012/02/13/computer-algorithms-insertion-sort/
+        //http://coderevisited.com/insertion-sort/
+        size_t i = S-1, j = 0;
+
+        for(; i > 0; --i)
+          if(a[i] < a[i-1]) swap(a[i], a[i-1]);
+
+        for(i = 2; i < S; ++i)
+          for(j = i; a[j] < a[j-1]; --j)
+            swap(a[j], a[j-1]);
       }
     }
 
-    /*template <typename T, size_t S>
-    void sortRange(std::array<T,S>& a, size_t l, size_t h) {
-      size_t i,j;
-      for (i = l; i < h; ++i) {
-        for (j = i; j > 0 && a[j] < a[j - 1]; --j)
-          swap(a[j], a[j-1]);
-      }
-    }*/
+    template <typename T, size_t S>
+    void sortRange(array<T,S>& a, size_t lo, size_t hi) {
+      size_t i = lo, j;
+
+      for (; i <= hi; ++i)
+        for (j = i; j > lo && a[j] < a[j-1]; --j)
+          swap(a, j, j-1);
+    }
   }
 }
 

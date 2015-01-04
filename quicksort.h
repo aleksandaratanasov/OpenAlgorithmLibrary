@@ -6,50 +6,36 @@
 #include <array>
 //#include <algorithm> // if std::swap is used
 #include "swap.h"
+#include "insertionsort.h"
 
 #define CUTOFF 7 // used to cut off the insertion sort, which is great for small arrays only
-
-using std::array;
 
 namespace sorting {
   namespace quicksort {
     // STATUS: not working
     namespace hybrid {
-      //Following implementation uses treeway partitioning, bit shifting, insertion sort (p.296) for small partitions and weighing if left or right branch are smaller/larger
+      //Following implementation uses 3-way partitioning, bit shifting, insertion sort (p.296) for small partitions and weighing if left or right branches are smaller/larger
+      // TODO: see why using the middle element of the array as pivot fails when applying 3-way-partitioning (current version works with 2-way-partitioning)
       template <typename T, size_t S>
-      void sort(std::array<T,S>& a, long int l, long int r) {
-        long int i = l-1, j = r, p = l-1, q = r;
-
-        if (r <= l + CUTOFF) {
-//          insertionsort::withguard::sortRange(a,l,r); // Segmentation fault here
+      void sort(std::array<T,S>& a, size_t l, size_t r) {
+        size_t i = l, j = r;
+        T pivot = a[(l+r)>>1];
+        if(r <= l + CUTOFF) {
+          insertionsort::sortRange(a, l, r);
           return;
         }
-        T pivot = a[r];
-        while(true)
-        {
-          while (a[++i] < pivot) ;
-          while (pivot < a[--j])
-            if (j == l) break;
-          if (i >= j) break;
-          swap(a[i], a[j]);
-          if (a[i] == pivot) {
-            p++;
-            swap(a[p], a[i]);
-          }
-          if (pivot == a[j]) {
-            q--;
-            swap(a[j], a[q]);
-          }
-        }
-        swap(a[i], a[r]); j = i-1; i = i+1;
-        long int k;
-        for (k = l; k < p; ++k, --j)
-          swap(a[k], a[j]);
-        for (k = r-1; k > q; --k, ++i)
-          swap(a[i], a[k]);
-        sort(a, l, j);
-        sort(a, i, r);
 
+        while (i <= j) {
+          while (a[i] < pivot) i++;
+          while (a[j] > pivot) j--;
+          if (i <= j) {
+            swap(a[i],a[j]);
+            i++;
+            j--;
+          }
+        };
+        if (l < j) sort(a, l, j);
+        if (i < r) sort(a, i, r);
       }
 
       template <typename T, size_t S>
@@ -99,6 +85,7 @@ namespace sorting {
       }
     }
 
+    // STATUS: working
     namespace normalwithshift {
       /*template <typename T, size_t S>
       size_t partition(std::array<T,S>& a, size_t lo, size_t hi) {
@@ -148,6 +135,7 @@ namespace sorting {
       }
     }
 
+    // STATUS: working
     namespace normal {
       //Using size_t is rediculious in case when we have to compare numeric values!!! It results in undefined behaviour (using size_t below leads to segmentation fault)
       template <typename T, size_t S>
