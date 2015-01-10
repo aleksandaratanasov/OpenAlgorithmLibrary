@@ -32,6 +32,14 @@ namespace sorting {
       }
     }
 
+    // STATUS: not implemented
+    namespace withguardidxtransform {
+      template <typename T, size_t S>
+      void sort(std::array<T,S>& a) {
+
+      }
+    }
+
     template <typename T, size_t S>
     void sortRange(array<T,S>& a, size_t lo, size_t hi) {
       size_t i = lo, j;

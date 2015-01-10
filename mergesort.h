@@ -11,13 +11,49 @@ using std::array;
 namespace sorting {
   namespace mergesort {
 
+    // STATUS: working (natural = non-optimized top-down?)
     namespace natural {
       template <typename T, size_t S>
-      void sort(array<T,S>& a) {
+      void copyArray(array<T,S>& src, size_t startPosSrc, array<T,S>& dst, size_t startPosDst, size_t length) {
+        for(size_t i = startPosSrc, j = startPosDst; i < length && j < length; ++i,++j)
+          dst[j] = src[i];
       }
 
       template <typename T, size_t S>
-      void merge() {
+      void merge(array<T,S>& a, array<T,S>& aux, size_t lo, size_t mid, size_t hi) {
+        size_t k = lo;
+        for (; k <= hi; ++k) aux[k] = a[k];
+
+        // merge back to a[]
+        size_t i = lo, j = mid+1;
+        for (k = lo; k <= hi; ++k) {
+          if(i > mid) a[k] = aux[j++];   // this copying is unnecessary
+          else if (j > hi) a[k] = aux[i++];
+          else if(aux[j] < aux[i]) a[k] = aux[j++];
+          else a[k] = aux[i++];
+        }
+      }
+
+      template <typename T, size_t S>
+      void sort(array<T,S>& a, array<T,S>& aux, size_t lo, size_t hi) {
+        if (hi <= lo) return;
+        size_t mid = lo + (hi - lo) / 2;
+        sort(a, aux, lo, mid);
+        sort(a, aux, mid + 1, hi);
+        merge(a, aux, lo, mid, hi);
+      }
+
+      template <typename T, size_t S>
+      void sort(array<T,S>& a) {
+        if(S < 2)
+          return;
+
+        array<T,S> *tmp = new array<T,S>(); //NEW
+//        array<T,S> tmp = a; //OLD
+//        sort(tmp, a, 0, S-1); //OLD
+        copyArray(a,0,*tmp,0,S); //NEW
+        sort(*tmp, a, 0, S-1);  //NEW
+        delete tmp; //NEW
       }
     }
 

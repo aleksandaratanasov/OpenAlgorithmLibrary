@@ -28,6 +28,7 @@
  * TODO:
  * - add the optimizations proposed in the exercises in the book mentioned above
  * - add descending and ascending test types!
+ * - use Google C++ Test Framework
  *
  * STATUS:
  * - WORKING (tested with integer and string using 10, 100, 1000, 100000 and 1000000 elements)
@@ -46,7 +47,7 @@
 #define CHECK_SORT
 
 // Data specific
-#define SIZE 10000              // The number of elements in the array that is passed to the sorting algorithm
+#define SIZE 100000              // The number of elements in the array that is passed to the sorting algorithm
 #ifdef STRING
   #define STRING_LENGTH_RANGE 32  // In case the data type of choice is string this value is used for the string random generator (see randomstring.h/.cpp);
                                   // each randomly generated string will have a length between 0 ("\0") and 31 ("....\0")
@@ -158,7 +159,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 #else
-  choice = INSERTION_NORMAL;//QUICK_HYBRID;
+  choice = QUICK_HYBRID;
 #endif
 
   cout << "Sorting using ";

@@ -15,8 +15,7 @@ namespace sorting {
     // STATUS: not working
     namespace hybrid {
       //Following implementation uses 3-way partitioning, bit shifting, insertion sort (p.296) for small partitions and weighing if left or right branches are smaller/larger
-      // TODO: see why using the middle element of the array as pivot fails when applying 3-way-partitioning (current version works with 2-way-partitioning)
-      template <typename T, size_t S>
+      /*template <typename T, size_t S>
       void sort(std::array<T,S>& a, size_t l, size_t r) {
         size_t i = l, j = r;
         T pivot = a[(l+r)>>1];
@@ -36,6 +35,47 @@ namespace sorting {
         };
         if (l < j) sort(a, l, j);
         if (i < r) sort(a, i, r);
+      }*/
+
+      template <typename T, size_t S>
+      void sort(std::array<T,S>& a, long int l, long int r) {
+        long int i = l-1, j = r, p = l-1, q = r;
+
+        if (r <= l + CUTOFF) {
+          insertionsort::sortRange(a, l, r);
+          return;
+        }
+
+        swap(a[(l+r)>>1], a[r]);
+        T pivot = a[r];
+
+        while(true)
+        {
+          while (a[++i] < pivot) ;
+          while (pivot < a[--j])
+            if (j == l) break;
+          if (i >= j) break;
+          swap(a[i], a[j]);
+          if (a[i] == pivot) {
+            p++;
+            swap(a[p], a[i]);
+          }
+          if (pivot == a[j]) {
+            q--;
+            swap(a[j], a[q]);
+          }
+        }
+
+        swap(a[i], a[r]); j = i-1; i = i+1;
+
+        long int k;
+        for (k = l; k < p; ++k, --j)
+          swap(a[k], a[j]);
+        for (k = r-1; k > q; --k, ++i)
+          swap(a[i], a[k]);
+        sort(a, l, j);
+        sort(a, i, r);
+
       }
 
       template <typename T, size_t S>
@@ -51,7 +91,10 @@ namespace sorting {
         long int i = l-1, j = r, p = l-1, q = r;
 
         if (r <= l) return; // WARNING! This has to be placed before the pivot is assigned! Otherwise r becomes -1, which leads to segmentation fault
+
+        swap(a[(l+r)/2], a[r]);
         T pivot = a[r];
+
         while(true)
         {
           while (a[++i] < pivot) ;
@@ -87,35 +130,13 @@ namespace sorting {
 
     // STATUS: working
     namespace normalwithshift {
-      /*template <typename T, size_t S>
-      size_t partition(std::array<T,S>& a, size_t lo, size_t hi) {
-        size_t i = lo;
-        size_t j = hi + 1;
-        T pivot = a[(lo + hi) >> 1];
-        while (true) {
-          while (a[++i] < pivot)
-            if (i == hi) break;
-          while (pivot < a[--j])
-            if (j == lo) break;
-          if (i >= j) break;
-          swap(a, i, j);
-        }
-        swap(a, lo, j);
-        return j;
-      }
-
-      template <typename T, size_t S>
-      void sort(std::array<T,S>& a, size_t lo, size_t hi) {
-        if (hi <= lo) return;
-        size_t j = partition(a, lo, hi);
-        sort(a, lo, j-1);
-        sort(a, j+1, hi);
-      }*/
-
       template <typename T, size_t S>
       void sort(std::array<T,S>& a, size_t l, size_t r) {
         size_t i = l, j = r;
-        T pivot = a[(l+r)>>1];  //http://stackoverflow.com/questions/6357038/is-multiplication-and-division-using-shift-operators-in-c-actually-faster
+
+        swap(a[(l+r)>>1], a[r]);
+        T pivot = a[r];
+
         while (i <= j) {
           while (a[i] < pivot) i++;
           while (a[j] > pivot) j--;
@@ -141,7 +162,10 @@ namespace sorting {
       template <typename T, size_t S>
       void sort(std::array<T,S>& a, size_t l, size_t r) {
         size_t i = l, j = r;
-        T pivot = a[(l+r)/2];
+
+        swap(a[(l+r)/2], a[r]);
+        T pivot = a[r];
+
         while (i <= j) {
           while (a[i] < pivot) i++;
           while (a[j] > pivot) j--;
