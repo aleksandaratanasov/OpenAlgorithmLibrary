@@ -11,53 +11,195 @@ using std::array;
 namespace sorting {
   namespace mergesort {
 
-    // STATUS: working (natural = non-optimized top-down?)
-    namespace natural {
-      template <typename T, size_t S>
-      void copyArray(array<T,S>& src, size_t startPosSrc, array<T,S>& dst, size_t startPosDst, size_t length) {
-        for(size_t i = startPosSrc, j = startPosDst; i < length && j < length; ++i,++j)
-          dst[j] = src[i];
-      }
+    // STATUS: not working - for some reason a shifting of one element occurs
+    //http://www.iti.fh-flensburg.de/lang/algorithmen/sortieren/merge/natmerge.htm
+    //http://www.algorithmist.com/index.php/Merge_sort#Natural_mergesort PSEUDOCODE
+//    namespace natural {
+//      template <typename T, size_t S>
+//      void copyArray(array<T,S>& src, size_t startPosSrc, array<T,S>& dst, size_t startPosDst, size_t length) {
+//        for(size_t i = startPosSrc, j = startPosDst; i < length && j < length; ++i,++j)
+//          dst[j] = src[i];
+//      }
 
-      template <typename T, size_t S>
-      void merge(array<T,S>& a, array<T,S>& aux, size_t lo, size_t mid, size_t hi) {
-        size_t k = lo;
-        for (; k <= hi; ++k) aux[k] = a[k];
+//      template <typename T, size_t S>
+//      void merge(array<T,S>& a, array<T,S>& aux, size_t lo, size_t hi, bool asc) {
+//        size_t k = asc ? lo : hi;
+//        size_t c = asc ? 1 : -1;
+//        size_t i = lo, j = hi;
 
-        // merge back to a[]
-        size_t i = lo, j = mid+1;
-        for (k = lo; k <= hi; ++k) {
-          if(i > mid) a[k] = aux[j++];   // this copying is unnecessary
-          else if (j > hi) a[k] = aux[i++];
-          else if(aux[j] < aux[i]) a[k] = aux[j++];
-          else a[k] = aux[i++];
-        }
-      }
+//        // jeweils das nächstgrößte Element zurückkopieren,
+//        // bis i und j sich überkreuzen
+//        while (i <= j ){
+//            if (a[i] <= a[j]) aux[k] = a[i++];
+//            else aux[k] = a[j--];
+//            k += c;
+//        }
+//      }
 
-      template <typename T, size_t S>
-      void sort(array<T,S>& a, array<T,S>& aux, size_t lo, size_t hi) {
-        if (hi <= lo) return;
-        size_t mid = lo + (hi - lo) / 2;
-        sort(a, aux, lo, mid);
-        sort(a, aux, mid + 1, hi);
-        merge(a, aux, lo, mid, hi);
-      }
+//      template <typename T, size_t S>
+//      bool mergeruns(array<T,S>& a, array<T,S>& aux) {
+//        size_t i = 0, k = 0;
+//        T pivot;
+//        bool asc = true;
 
-      template <typename T, size_t S>
-      void sort(array<T,S>& a) {
-        if(S < 2)
-          return;
+//        while (i < S) {
+//          k = i;
+//          do pivot=a[i++]; while (i < S && pivot <= a[i]);  // ascending part
+//          while (i < S && pivot >= a[i]) pivot = a[i++];  //descending part
+//          merge (a, aux, k, i-1, asc);
+//          asc = !asc;
+//        }
 
-        array<T,S> *tmp = new array<T,S>(); //NEW
-//        array<T,S> tmp = a; //OLD
-//        sort(tmp, a, 0, S-1); //OLD
-        copyArray(a,0,*tmp,0,S); //NEW
-        sort(*tmp, a, 0, S-1);  //NEW
-        delete tmp; //NEW
+//        return k == 0;
+//      }
+
+//      template <typename T, size_t S>
+//      void naturalmergesort(array<T,S>& a, array<T,S>& aux) {
+//        while(!mergeruns(a,aux) & !mergeruns(aux,a));
+//      }
+
+//      template <typename T, size_t S>
+//      void sort(array<T,S>& a) {
+//        if(S < 2)
+//          return;
+
+//        array<T,S> *tmp = new array<T,S>(); //NEW
+////        array<T,S> tmp = a; //OLD
+////        sort(tmp, a, 0, S-1); //OLD
+////        copyArray(a,0,*tmp,0,S); //replaced by std::copy_n
+//        std::copy_n(a.begin(), S, (*tmp).begin()); //NEW
+
+//        naturalmergesort(a, *tmp);  //NEW
+//        delete tmp; //NEW
+//      }
+//    }
+
+  namespace natural {
+    template<typename T, size_t S>
+    void merge_natural(std::array<T, S>& a, std::array<T, S>& b, size_t lo, size_t hi, bool asc) {
+      size_t k, c, i, j;
+      for (k = lo; k <= hi; ++k) b[k] = a[k];
+
+      k = asc ? lo : hi;
+      c = asc ? 1 : -1;
+      i = lo;
+      j = hi;
+
+      while (i <= j) {
+        if (b[i] <= b[j]) a[k] = b[i++];
+        else a[k] = b[j--];
+
+        k += c;
       }
     }
 
-    // STATUS: not working (only for up to 4500 elements)
+    template<typename T, size_t S>
+    bool mergeruns(std::array<T, S>& a, std::array<T, S>& b) {
+      size_t i=0, k=0;
+      T x;
+      bool asc = true;
+      while (i<S) {
+        k = i;
+        do {
+          x = a[i++];
+        } while (i<S && x<= a[i]);
+        while( i<S && x>=a[i]) x = a[i++];
+        merge_natural(a, b, k, i-1, asc);
+        asc = !asc;
+      }
+
+      return k == 0;
+    }
+
+    template <typename T, size_t S>
+    void sort(std::array<T, S>& a) {
+      std::array<T, S> *b = new std::array<T, S>();
+      while (!mergeruns(a, *b));
+      delete b;
+    }
+  }
+
+//    namespace natural {
+//      template <typename T, size_t SIZE>
+//      void sort(std::array<T, SIZE>& a) {
+//        std::array<T, SIZE> *b = new std::array<T, SIZE>();
+//        size_t h, i, j, k, l, d;
+//        bool sd_i, sd_j, sorted;
+
+//        do {
+//          d = 1;
+//          i = k = 0;
+//          j = l = SIZE;
+//          sd_i = sd_j = false;
+//          sorted=true;
+
+//          while (i <= j) {
+//            if ((!sd_i && sd_j && a[i] <= a[j]) || (!sd_i && sd_j)) {
+//              (*b)[k] = a[i ++];
+//              k = k + d;
+//              if (i <= j && a[i - 1] > a[i]) sd_i = true;
+//            }
+//            else if ((!sd_i && !sd_j && a[i] > a[j]) || (sd_i && !sd_j)) {
+//              (*b)[k] = a[j --];
+//              k = k+d;
+//              if (i <= j && a[j] < a[j+1]) sd_j = true;
+//            }
+//            else {
+//                h = k; k = l; l = h;
+//                d = -d;
+//                sd_i = sd_j = sorted = false;
+//            }
+//          }
+
+//          for (size_t m = 0; m <= SIZE; ++m) a[m] = (*b)[m];
+//        } while (!sorted);
+//        delete b;
+//      }
+//    }
+
+//    namespace natural {
+//      template<typename T, size_t SIZE>
+//      void merge_natural(std::array<T, SIZE>& a, std::array<T, SIZE>& b, size_t lo, size_t hi, bool asc) {
+//        for (size_t k = lo; k <= hi; ++k) b[k] = a[k];
+//        size_t k = asc ? lo : hi;
+//        size_t c = asc ? 1 : -1;
+//        size_t i = lo, j = hi;
+//        while (i <= j) {
+//          if (b[i] <= b[j]) a[k] = b[i++];
+//          else a[k] = b[j--];
+//        }
+//        k += c;
+//      }
+
+//      template<typename T, size_t SIZE>
+//      bool mergeruns(std::array<T, SIZE>& a, std::array<T, SIZE>& b)
+//      {
+//        size_t i=0, k=0;
+//        T x;
+//        bool asc = true;
+//        while (i < SIZE) {
+//          k = i;
+//          do {
+//            x = a[i++];
+//          } while (i < SIZE && x <= a[i]);
+//          while( i < SIZE && x >= a[i])
+//          x = a[i++];
+//          merge_natural(a, b, k, i-1, asc);
+//          asc = !asc;
+//        }
+//        return k == 0;
+//      }
+
+//      template <typename T, size_t SIZE>
+//      void sort(std::array<T, SIZE>& a)
+//      {
+//        std::array<T, SIZE> *b = new std::array<T, SIZE>();
+//        while (!mergeruns(a, *b));
+//        delete b;
+//      }
+//    }
+
+    // STATUS: not working (only for up to 4500 NUMERIC elements)
     // Optimized top-down mergesort
     //  - use insertion sort for the small subarrays
     //  - TODO: test if array that is to be sorted isn't already sorted
@@ -119,7 +261,8 @@ namespace sorting {
         array<T,S> *tmp = new array<T,S>(); //NEW
 //        array<T,S> tmp = a; //OLD
 //        sort(tmp, a, 0, S-1); //OLD
-        copyArray(a,0,*tmp,0,S); //NEW
+//        copyArray(a,0,*tmp,0,S); //replaced by std::copy_n
+        std::copy_n(a.begin(), S, (*tmp).begin());
         sort(*tmp, a, 0, S-1);  //NEW
         delete tmp; //NEW
       }
@@ -135,14 +278,10 @@ namespace sorting {
           tmp[k] = a[k];
 
         for (k = lo; k <= hi; ++k) {
-            if(i > mi)
-              a[k] = tmp[j++];
-            else if(j > hi)
-              a[k] = tmp[i++];
-            else if (tmp[j] < tmp[i])
-              a[k] = tmp[j++];
-            else
-              a[k] = tmp[i++];
+            if(i > mi) a[k] = tmp[j++];
+            else if(j > hi) a[k] = tmp[i++];
+            else if (tmp[j] < tmp[i]) a[k] = tmp[j++];
+            else a[k] = tmp[i++];
         }
       }
 
