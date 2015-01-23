@@ -6,10 +6,6 @@
 
 using std::array;
 
-// TODO: Use a different implementation. The current one requires signed values for the looping
-// which makes it impossible to use size_t because the resulting sorted array is sorted in a weird way
-// (first come the positive sorted values, then - the negative sorted values)
-
 namespace sorting {
   namespace shellsort {
     /*template <typename T>

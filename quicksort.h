@@ -203,16 +203,14 @@ namespace sorting {
               swap(a[j], a[q]);
             }
           }
-
           swap(a[i], a[r]); j = i-1; i = i+1;
-
           long int k;
           for (k = l; k < p; ++k, --j)
             swap(a[k], a[j]);
           for (k = r-1; k > q; --k, ++i)
             swap(a[i], a[k]);
 
-          //          // Balancing trees (which one is greater)
+          // Balancing trees (which one is greater)
           //          if((r-i) > 0 && (j-l) > 0 && ((r-i) << FACTOR < (j-l) || (j-l) << 6 < (r-i))) {
           //            quicksort(a,l,(l+r)>>1,b);
           //            quicksort(a,l,(l+r)>>1 + 1,r,b);
@@ -225,10 +223,10 @@ namespace sorting {
           //            sort(a, b, i, j);
           //          }
 
-          // Remove when the commented code above is ready
+
+          // Remove lines below when the commented out code above is ready
           sort(a, l, j);
           sort(a, i, r);
-
         }
 
         template <typename T, size_t S>

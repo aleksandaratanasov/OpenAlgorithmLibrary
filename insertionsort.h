@@ -27,6 +27,7 @@ namespace sorting {
         //http://algs4.cs.princeton.edu/21elementary/
         size_t i = S-1, j = 0;
 
+        // Find guard; for loop below is equal to std::swap(a[l], *std::min_element(&a[l], &a[r])); (see sortRange(...))
         for (; i > 0; i--) {
           if (a[i] < a[i - 1]) {
             swap(a[i], a[i-1]);
@@ -85,6 +86,7 @@ namespace sorting {
       }
     }
 
+    // My old version
     template <typename T, size_t S>
     void sortRange(array<T,S>& a, size_t lo, size_t hi) {
       size_t i = lo, j;
@@ -93,6 +95,23 @@ namespace sorting {
         for (j = i; j > lo && a[j] < a[j-1]; --j)
           swap(a, j, j-1);
     }
+
+    // New version
+//    template<typename T, size_t SIZE>
+//    void sortRange(std::array<T, SIZE>& a, size_t l, size_t r)
+//    {
+//        // Spaw the smalles element on the given position
+//        std::swap(a[l], *std::min_element(&a[l], &a[r]));
+
+//        //Run over the right array
+//        for (size_t i = l + 1; i < r; ++i) {
+//            T t = a[i];
+//            // Runs over from the current element in the array backwards to the left and sets it on the correct position if it's smaller
+//            for (size_t j = i; t < a[--j];) { // before this j has been decremented once
+//                std::swap(a[j+1], a[j]);
+//            }
+//        }
+//    }
   }
 }
 
