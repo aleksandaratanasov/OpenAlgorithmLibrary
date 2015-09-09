@@ -13,21 +13,22 @@
 #include "heapsort.h"
 #include "shellsort.h"
 
-
 //10000, 20000, 40000, 80000, 160000, 320000, 640000,...
 //#define SIZE 10
 //#define SIZE 100
 //#define SIZE 1000
-#define SIZE 10000
+//#define SIZE 10000
 //#define SIZE 20000
 //#define SIZE 40000
 //#define SIZE 80000
 //#define SIZE 160000
 //#define SIZE 320000
 //#define SIZE 640000
-//#define SIZE 1280000
+#define SIZE 1280000
 //#define SIZE 2560000
 //#define SIZE 5120000
+//#define SIZE 10240000
+//#define SIZE 20480000
 
 #define MU "\u03BC"
 
@@ -105,6 +106,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Following time measurements are done on an array with " << SIZE << " elements" << endl;
 
+// We can do it with more but it gets insanely slow for large arrays
 #if SIZE <= 40000
   // INSERTION SORT
   getFullTime(&(sorting::insertionsort::normal::sort), *asc, *des, *ran, "Insertion sort (normal)");
@@ -121,13 +123,20 @@ int main(int argc, char *argv[]) {
   getFullTime(&(sorting::quicksort::normal::sort), *asc, *des, *ran, "Quick sort (normal)");
   getFullTime(&(sorting::quicksort::normalwithshift::sort), *asc, *des, *ran, "Quick sort (normal + bitshift)");
   getFullTime(&(sorting::quicksort::threewaypartwithshift::sort), *asc, *des, *ran, "Quick sort (3-way-partition + bitshift)");
-  getFullTime(&(sorting::quicksort::hybrid::sort), *asc, *des, *ran, "Quick sort (hybrid)");
+  getFullTime(&(sorting::quicksort::hybrid::sort), *asc, *des, *ran, "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort)");
+  getFullTime(&(sorting::quicksort::hybridFull::sort), *asc, *des, *ran, "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort + merge sort)");
 
   // HEAP SORT
   getFullTime(&(sorting::heapsort::sort), *asc, *des, *ran, "Heap sort");
 
   // SHELL SORT
   getFullTime(&(sorting::shellsort::sort), *asc, *des, *ran, "Shell sort");
+
+//  cout << "TEST TEST TEST TEST TEST TEST" << endl;
+//  for(i = 0; i < SIZE; ++i) cout << (*des)[i] << endl;
+//  sorting::quicksort::hybridFull::sort(*des);
+//  cout << "RESULT RESULT RESULT RESULT" << endl;
+//  for(i = 0; i < SIZE; ++i) cout << (*des)[i] << endl;
 
   delete asc;
   delete des;

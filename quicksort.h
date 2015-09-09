@@ -9,8 +9,8 @@
 #include "insertionsort.h"
 #include "mergesort.h"
 
-#define CUTOFF 7 // used to cut off the insertion sort, which is great for small arrays only
-#define FACTOR 6
+#define CUTOFF 32 // used to cut off the insertion sort, which is decent only for small arrays
+#define FACTOR 7
 
 namespace sorting {
   namespace quicksort {
@@ -150,9 +150,8 @@ namespace sorting {
       }
     }
 
-    // STATUS: not working
+    // STATUS: working (only 3-way-partitioning and insertion sort
     namespace hybrid {
-      //Following implementation uses 3-way partitioning, bit shifting, insertion sort (p.296) for small partitions and weighing if left or right branches are smaller/larger
   //      template <typename T, size_t S>
   //      void sort(std::array<T,S>& a, size_t l, size_t r) {
   //        size_t i = l, j = r;
@@ -268,6 +267,81 @@ namespace sorting {
 //        quicksort_hybrid(*tmp, a, 0, S-1);
 //        delete tmp;
 //      }
+    }
+
+    // STATUS: working (hybrid + merge sort) but still some access error (gtest fails for strings)
+    namespace hybridFull {
+      template<typename T, size_t SIZE>
+      void sort(std::array<T, SIZE> &a, std::array<T, SIZE> &b, long int l, long int r)
+      {
+        if (r <= l) return;
+
+        if (r - l + 1 < CUTOFF)
+        {
+          insertionsort::sortRange(a, l, r + 1);
+//          insertionsort::sortRange(a, l, r);
+        }
+        else
+        {
+          long int i = l - 1;
+          long int j = r;
+          long int p = l - 1;
+          long int q = r;
+
+          T v = a[(l + r) >> 1];
+          std::swap(a[r], a[(l + r) >> 1]);
+
+          for (;;)
+          {
+            while (a[++i] < v);
+
+            while (v < a[--j])
+            {
+              if (j == l){break;}
+            }
+
+            if (i >= j) {break;}
+            std::swap(a[i], a[j]);
+
+            if (a[i] == v) { p++; std::swap(a[p], a[i]); }
+            if (v == a[j]) { q--; std::swap(a[j], a[q]); }
+          }
+
+          std::swap(a[i], a[r]);
+          j = i - 1;
+          i = i + 1;
+
+          for (int k = l; k < p; k++, j--)
+          {
+            std::swap(a[k], a[j]);
+          }
+
+          for (int k = r - 1; k > q; k--, i++)
+          {
+            std::swap(a[i], a[k]);
+          }
+
+
+          if ((r-i) > 0 && (j-l) > 0 && ((r-i)<<FACTOR < (j-l) || (j-l)<<FACTOR < (r-i)))
+          {
+            sort(a, b, l, (l+r)>>1);
+            sort(a, b, ((l+r)>>1) + 1, r);
+            mergesort::merge(a, b, l, ((l+r)>>1), r);
+          }
+          else
+          {
+            sort(a, b, l, j);
+            sort(a, b, i, r);
+          }
+        }
+      }
+
+      template <typename T, size_t S>
+      void sort(std::array<T,S> &a) {
+        std::array<T,S> *b = new std::array<T,S>();
+        sort(a, *b, 0, S-1);
+        delete b;
+      }
     }
   }
 }

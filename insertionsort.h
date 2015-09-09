@@ -9,17 +9,19 @@
 
 namespace sorting {
   namespace insertionsort {
+    // STATUS: working
     namespace normal{
       template <typename T, size_t S>
       void sort(std::array<T,S>& a) {
         size_t i,j;
         for (i = 1; i < S; ++i) {
           for (j = i; j > 0 && a[j] < a[j - 1]; --j)
-            swap(a[j], a[j-1]);
+            std::swap(a[j], a[j-1]);
         }
       }
     }
 
+    // STATUS: working
     namespace withguard {
       template <typename T, size_t S>
       void sort(std::array<T,S>& a) {
@@ -30,7 +32,7 @@ namespace sorting {
         // Find guard; for loop below is equal to std::swap(a[l], *std::min_element(&a[l], &a[r])); (see sortRange(...))
         for (; i > 0; i--) {
           if (a[i] < a[i - 1]) {
-            swap(a[i], a[i-1]);
+            std::swap(a[i], a[i-1]);
           }
         }
 
@@ -40,7 +42,7 @@ namespace sorting {
 //          std::cout << "outer[" << i << "] : inner[" << j << "]" << std::endl;
           for (j = i; a[j] < a[j - 1]; j--) {
 //            std::cout << "outer[" << i << "] : inner[" << j << "]" << std::endl;
-            swap(a[j], a[j-1]);
+            std::swap(a[j], a[j-1]);
           }
 //            if(i >= 4500)
 //              std::cout << "outer[" << i << "] : inner[" << j << "]" << std::endl;
@@ -65,6 +67,7 @@ namespace sorting {
 //      }
 //    }
 
+    // STATUS: working (still some minor issue with incorrect access at some point; check indices again)
     namespace withguardidxtransform {
       template <typename T, size_t S>
       void sort(std::array<T,S>& a) {
@@ -73,7 +76,11 @@ namespace sorting {
 
         size_t min = l;
 
-        for (size_t i = l+1; i < (r+1); ++i)
+        //used to be i < (r+1), which does not make sence since we start with r = SIZE,
+        //thus the loop will iterate SIZE number of steps leading to incorrect access
+
+        // von links nach rechts
+        for (size_t i = l+1; i < r; ++i)
           if (a[i] < a[min]) min = i;
 
         std::swap(a[l], a[min]);
@@ -81,7 +88,7 @@ namespace sorting {
         for (size_t i = l+2; i < r + 1; ++i) {
           T tmp = a[i];
           for (size_t j = i; tmp < a[--j];)
-               swap(a[j + 1], a[j]);
+               std::swap(a[j + 1], a[j]);
         }
       }
     }

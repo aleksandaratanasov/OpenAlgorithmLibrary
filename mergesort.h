@@ -4,12 +4,39 @@
 #include <array>
 #include "swap.h"
 #include "insertionsort.h"
-#define CUTOFF 7 // used to cut off the insertion sort, which is great for small arrays only
+#define CUTOFF 32 // used to cut off the insertion sort, which is great for small arrays only
 
 using std::array;
 
 namespace sorting {
   namespace mergesort {
+
+    template<typename T, size_t SIZE>
+    void merge(std::array<T, SIZE> &a, std::array<T, SIZE> &b, long int lo, long int m, long int hi)
+    {
+      long int i = lo;
+      long int j = hi;
+      long int k = lo;
+
+      // vordere Hälfte in Array b kopieren
+      while (i <= m) b[k++] = a[i++];
+
+      // hintere Hälfte in umgekehrter Reihenfolge in Array b kopieren
+      while (j > m) b[k++] = a[j--];
+
+      i = lo;
+      j = hi;
+      k = lo;
+
+      // jeweils das nächstgrößte Element zurückkopieren, bis i und j sich überkreuzen
+      while (i <= j)
+      {
+        if (b[i] <= b[j])
+          a[k++] = b[i++];
+        else
+          a[k++] = b[j--];
+      }
+    }
 
     // STATUS: not working - for some reason a shifting of one element occurs
     //http://www.iti.fh-flensburg.de/lang/algorithmen/sortieren/merge/natmerge.htm
