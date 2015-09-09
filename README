@@ -6,3 +6,8 @@ CAUTION! This may still cause segmentation fault if you do not have enough memor
 
 That is why dynamic allocation has to be used. Currently main.cpp contains a small test that works with the stack and the array there
 is limited only to 100 elements
+
+### Unit Testing
+
+Visit my other repo on github: https://github.com/aleksandaratanasov/OpenAlgorithmLibraryUnitTesting
+I'm using Google Test (gtest for short) for the unit testing of the library
