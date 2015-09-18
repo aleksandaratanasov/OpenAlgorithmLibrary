@@ -1,7 +1,9 @@
 project(OpenAlgorithmLibrary)
 cmake_minimum_required(VERSION 2.8)
 
-# For the final build use -DCMAKE_BUILD_TYPE=Release
+# For the final build use -DCMAKE_BUILD_TYPE=Release for the executable from main.cpp
+set(CMAKE_BUILD_TYPE Release)
+
 if(UNIX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x -O3 -g0")
     #-O3 (level of optimization 3)

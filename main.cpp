@@ -24,8 +24,8 @@
 //#define SIZE 160000
 //#define SIZE 320000
 //#define SIZE 640000
-#define SIZE 1280000
-//#define SIZE 2560000
+//#define SIZE 1280000
+#define SIZE 2560000
 //#define SIZE 5120000
 //#define SIZE 10240000
 //#define SIZE 20480000
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   size_t i = 0;
   array<double,SIZE> *asc = new array<double,SIZE>(), *des = new array<double, SIZE>(), *ran = new array<double, SIZE>();
 
-  // The original array contains elements in ascending order thus it's already sorted, which is the best case scenario
+  // The original array contains elements in ascending order thus it's already sorted, which is the best case scenario (unless in quicksort we pick the wrong pivot ;))
   double startVal = -(SIZE/2);
   for(; i < SIZE; ++i, startVal += 1.123456789) (*asc)[i] = startVal;
   std::copy_n((*asc).begin(), SIZE, (*des).begin()); std::reverse((*des).begin(), (*des).end());
@@ -109,34 +109,28 @@ int main(int argc, char *argv[]) {
 // We can do it with more but it gets insanely slow for large arrays
 #if SIZE <= 40000
   // INSERTION SORT
-  getFullTime(&(sorting::insertionsort::normal::sort), *asc, *des, *ran, "Insertion sort (normal)");
-  getFullTime(&(sorting::insertionsort::withguard::sort), *asc, *des, *ran, "Insertion sort (guard)");
+  getFullTime(&(oal::sorting::insertionsort::normal::sort), *asc, *des, *ran, "Insertion sort (normal)");
+  getFullTime(&(oal::sorting::insertionsort::withguard::sort), *asc, *des, *ran, "Insertion sort (guard)");
   // still some issues with index transformation
-  getFullTime(&(sorting::insertionsort::withguardidxtransform::sort), *asc, *des, *ran, "Insertion sort (guard + idx.trans)");
+  getFullTime(&(oal::sorting::insertionsort::withguardidxtransform::sort), *asc, *des, *ran, "Insertion sort (guard + idx.trans)");
 #endif
 
   // MERGE SORT
-  getFullTime(&(sorting::mergesort::bottomup::sort), *asc, *des, *ran, "Merge sort (bottom-up)");
-  getFullTime(&(sorting::mergesort::natural::sort), *asc, *des, *ran, "Merge sort (natural)");
+  getFullTime(&(oal::sorting::mergesort::bottomup::sort), *asc, *des, *ran, "Merge sort (bottom-up)");
+  getFullTime(&(oal::sorting::mergesort::natural::sort), *asc, *des, *ran, "Merge sort (natural)");
 
   // QUICK SORT
-  getFullTime(&(sorting::quicksort::normal::sort), *asc, *des, *ran, "Quick sort (normal)");
-  getFullTime(&(sorting::quicksort::normalwithshift::sort), *asc, *des, *ran, "Quick sort (normal + bitshift)");
-  getFullTime(&(sorting::quicksort::threewaypartwithshift::sort), *asc, *des, *ran, "Quick sort (3-way-partition + bitshift)");
-  getFullTime(&(sorting::quicksort::hybrid::sort), *asc, *des, *ran, "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort)");
-  getFullTime(&(sorting::quicksort::hybridFull::sort), *asc, *des, *ran, "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort + merge sort)");
+  getFullTime(&(oal::sorting::quicksort::normal::sort), *asc, *des, *ran, "Quick sort (normal)");
+  getFullTime(&(oal::sorting::quicksort::normalwithshift::sort), *asc, *des, *ran, "Quick sort (normal + bitshift)");
+  getFullTime(&(oal::sorting::quicksort::threewaypartwithshift::sort), *asc, *des, *ran, "Quick sort (3-way-partition + bitshift)");
+  getFullTime(&(oal::sorting::quicksort::hybrid::sort), *asc, *des, *ran, "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort)");
+  getFullTime(&(oal::sorting::quicksort::hybridFull::sort), *asc, *des, *ran, "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort + merge sort)");
 
   // HEAP SORT
-  getFullTime(&(sorting::heapsort::sort), *asc, *des, *ran, "Heap sort");
+  getFullTime(&(oal::sorting::heapsort::sort), *asc, *des, *ran, "Heap sort");
 
   // SHELL SORT
-  getFullTime(&(sorting::shellsort::sort), *asc, *des, *ran, "Shell sort");
-
-//  cout << "TEST TEST TEST TEST TEST TEST" << endl;
-//  for(i = 0; i < SIZE; ++i) cout << (*des)[i] << endl;
-//  sorting::quicksort::hybridFull::sort(*des);
-//  cout << "RESULT RESULT RESULT RESULT" << endl;
-//  for(i = 0; i < SIZE; ++i) cout << (*des)[i] << endl;
+  getFullTime(&(oal::sorting::shellsort::sort), *asc, *des, *ran, "Shell sort");
 
   delete asc;
   delete des;
