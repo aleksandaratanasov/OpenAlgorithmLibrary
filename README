@@ -2,10 +2,61 @@ For very large array a segmentation fault may occurr due to the default limits o
 On *nix systems use:
 ulimit -s unlimited
 
-CAUTION! This may still cause segmentation fault if you do not have enough memory (incl. virtual). Use with great caution. Also even for something like an array of 16000000 elements on a system with 4GB RAM it gets filled up and you will experience sever performance drops therefore it is advisable to save all your work, close as many applications as possible and then simply let the damn thing run. LOL
+**Note:** Time measurement for insertion sort is disabled for arrays with size 40 000 or more due to the time it takes for large arrays to be sorted on my poor old notebook.
 
-That is why dynamic allocation has to be used. Currently main.cpp contains a small test that works with the stack and the array there
-is limited only to 100 elements
+Below you can see the output in terminal when the time measurement is ran. Times are displayed in milliseconds (for large arrays), in microseconds (for medium sized arrays)
+and in nanoseconds (for small arrays). Initially time measurement was done in seconds. However for small to medium sized arrays on my computer all some of the algorithms
+are too fast which leads to measurements of 0 seconds. In case granularity needs to be adjusted feel free to alter the time unit.
+reported
+
+**Terminal output:**
+
+Following time measurements are done on an array with 1280000 elements
+Time measurement for "Merge sort (bottom-up)":
+Merge sort (bottom-up) | asc : [583ms | 583654μs | 5.83655e+08ns]
+Merge sort (bottom-up) | des : [250ms | 250971μs | 2.50972e+08ns]
+Merge sort (bottom-up) | ran : [386ms | 386836μs | 3.86837e+08ns]
+**********************************************************************
+Time measurement for "Merge sort (natural)":
+Merge sort (natural) | asc : [30ms | 30501μs | 3.05011e+07ns]
+Merge sort (natural) | des : [25ms | 25617μs | 2.56176e+07ns]
+Merge sort (natural) | ran : [332ms | 332813μs | 3.32813e+08ns]
+**********************************************************************
+Time measurement for "Quick sort (normal)":
+Quick sort (normal) | asc : [66ms | 66018μs | 6.6019e+07ns]
+Quick sort (normal) | des : [52ms | 52528μs | 5.25282e+07ns]
+Quick sort (normal) | ran : [212ms | 212344μs | 2.12344e+08ns]
+**********************************************************************
+Time measurement for "Quick sort (normal + bitshift)":
+Quick sort (normal + bitshift) | asc : [50ms | 50108μs | 5.01085e+07ns]
+Quick sort (normal + bitshift) | des : [52ms | 52966μs | 5.29663e+07ns]
+Quick sort (normal + bitshift) | ran : [206ms | 206176μs | 2.06177e+08ns]
+**********************************************************************
+Time measurement for "Quick sort (3-way-partition + bitshift)":
+Quick sort (3-way-partition + bitshift) | asc : [55ms | 55837μs | 5.58379e+07ns]
+Quick sort (3-way-partition + bitshift) | des : [64ms | 64854μs | 6.48545e+07ns]
+Quick sort (3-way-partition + bitshift) | ran : [230ms | 230769μs | 2.30769e+08ns]
+**********************************************************************
+Time measurement for "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort)":
+Quick sort (hybrid: 3-way-partition + bitshift + insertion sort) | asc : [54ms | 54942μs | 5.49424e+07ns]
+Quick sort (hybrid: 3-way-partition + bitshift + insertion sort) | des : [70ms | 70133μs | 7.01333e+07ns]
+Quick sort (hybrid: 3-way-partition + bitshift + insertion sort) | ran : [204ms | 204387μs | 2.04388e+08ns]
+**********************************************************************
+Time measurement for "Quick sort (hybrid: 3-way-partition + bitshift + insertion sort + merge sort)":
+Quick sort (hybrid: 3-way-partition + bitshift + insertion sort + merge sort) | asc : [37ms | 37241μs | 3.72416e+07ns]
+Quick sort (hybrid: 3-way-partition + bitshift + insertion sort + merge sort) | des : [59ms | 59675μs | 5.96754e+07ns]
+Quick sort (hybrid: 3-way-partition + bitshift + insertion sort + merge sort) | ran : [200ms | 200781μs | 2.00782e+08ns]
+**********************************************************************
+Time measurement for "Heap sort":
+Heap sort | asc : [221ms | 221454μs | 2.21454e+08ns]
+Heap sort | des : [263ms | 263488μs | 2.63488e+08ns]
+Heap sort | ran : [1280ms | 1.2805e+06μs | 1.2805e+09ns]
+**********************************************************************
+Time measurement for "Shell sort":
+Shell sort | asc : [103ms | 103162μs | 1.03162e+08ns]
+Shell sort | des : [114ms | 114391μs | 1.14391e+08ns]
+Shell sort | ran : [617ms | 617763μs | 6.17763e+08ns]
+**********************************************************************
 
 ### Unit Testing
 
